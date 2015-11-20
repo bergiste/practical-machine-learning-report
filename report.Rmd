@@ -1,0 +1,185 @@
+---
+title: "Practical Machine Learning Assignment"
+author: "Jose Bergiste"
+date: "November 19, 2015"
+output: html_document
+---
+
+##Overview
+The objective of this project was to create a prediction algorithm to evaluate the manner in which an individual did a weight lifting exercise. There are a wide variety of devices (such as Jawbone Up, Nike FuelBand and Fitbit) that collect human physical movement information. The data that these devices collect can be used to determine what the individual was doing during the time of collection.
+
+##Data
+For this project we used a Weight Lifting Exercise data set available at http://groupware.les.inf.puc-rio.br/har. The training data set can be downloaded at https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv and the testing data set can be downloaded at https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv .
+
+The training data set contains 19622 records and 160 features. The testing data set contains 20 records with 160 features. It is important to note that the testing data set does not contain the answers, so, I considered it a validation set and I created a new testing set from a random sample of the training set.
+
+##The Prediction Process
+Given that we had a well defined question, the next step was to understand the data and the features. One of the positives is that we are using data that is directly tied to physical exercise to predict a physical exercise. Since this data set has 160 features, it was not as straight forward to clearly articulate all of the features. Nevertheless, I read the general information available from the source website about the features.
+
+###The Need for Feature Reduction
+My first instinct was that 160 features would not be necessary to make an accurate prediction. One of the first things I noticed immediately was that there were many missing values from the features. Also, I was very curious about the uniqueness of the values in the data.
+
+I performed the following activities which reduced the number of features from 160 to 53:
+
+- Performed a uniqueness test by using R's nearZeroVar function and safely eliminated any features that were considered near zero
+- Removed any features that I thought were completely irrelevant to predicting this problem ('X', 'user_name', "raw_timestamp_part_1", "raw_timestamp_part_2", "cvtd_timestamp", "new_window", "num_window")
+- Performed a data completeness test by using R's complete.cases function to eliminate columns with null values
+
+###Prediction Algorithm Selection
+Since we are trying to predict class data, many of the purely linear regressions methods were not considered. The algorithms that I tested were Decision Trees, Random Forest, Boosting, and Naive Bayes. 
+
+My evaluation process was to train each algorithm on the training set and apply a prediction once and only once to the testing set (created from a random sample of the training set). I compared the accuracy of each method and found that Random Forest performed the best out of all of the methods. 
+
+## Results
+I applied the selected model to the validation set and got 20/20 on the automated grading portion of this assignment. Here are the accuracy statistics:
+
+```
+Overall Statistics
+                                          
+               Accuracy : 0.9937          
+                 95% CI : (0.9913, 0.9956)
+    No Information Rate : 0.2845          
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.992           
+ Mcnemar's Test P-Value : NA              
+
+Statistics by Class:
+
+                     Class: A Class: B Class: C Class: D Class: E
+Sensitivity            0.9964   0.9878   0.9902   0.9938   0.9991
+Specificity            0.9986   0.9987   0.9975   0.9982   0.9992
+Pos Pred Value         0.9964   0.9947   0.9883   0.9907   0.9963
+Neg Pred Value         0.9986   0.9971   0.9979   0.9988   0.9998
+Prevalence             0.2845   0.1949   0.1740   0.1633   0.1833
+Detection Rate         0.2834   0.1925   0.1723   0.1623   0.1832
+Detection Prevalence   0.2845   0.1935   0.1743   0.1638   0.1839
+Balanced Accuracy      0.9975   0.9933   0.9939   0.9960   0.9991
+```
+
+#Appendix
+Below is the complete R code used to process and prepare the data as well as applying a prediction method:
+
+```{r eval=FALSE}
+#Load the essential caret library
+library(caret)
+
+#Load the data files
+trainingFile <- "pml-training.csv"
+testingFile <- "pml-testing.csv"
+
+trainingData <- read.csv(trainingFile)
+validation <- read.csv(testingFile) # I considered this data a validation and not a testing set
+
+#Set random seed to ensure repeatable results
+set.seed(8923)
+
+#Split the data into a training and testing set
+inTrain <- createDataPartition(trainingData$classe, p = .7, list = F)
+
+training <- trainingData[inTrain,]
+testing <- trainingData[-inTrain,]
+
+#Performed some basic exploratory analysis to see if there were any features that stuck out
+summary(training[training$class == "A",])
+summary(training[training$class == "B",])
+summary(training[training$class == "C",])
+summary(training[training$class == "D",])
+summary(training[training$class == "E",])
+
+#Check near zero values on the data
+nsv <- nearZeroVar(trainingData, saveMetrics = TRUE)
+nsv
+
+#Create a list of features to remove. This is a list because I wanted to quickly move features in and out to evaluate the impacts
+remFeatures <- c(
+    'X',
+    'user_name', 
+    "raw_timestamp_part_1", 
+    "raw_timestamp_part_2",
+    "cvtd_timestamp",
+    "new_window",
+    "num_window",
+    "kurtosis_roll_belt",
+    "kurtosis_picth_belt",
+    "kurtosis_yaw_belt",  
+    "skewness_roll_belt", 
+    "skewness_roll_belt.1",
+    "skewness_yaw_belt", 
+    "max_yaw_belt",
+    "min_yaw_belt",
+    "amplitude_yaw_belt",
+    "avg_roll_arm",             
+    "stddev_roll_arm",          
+    "var_roll_arm",             
+    "avg_pitch_arm",            
+    "stddev_pitch_arm",         
+    "var_pitch_arm",            
+    "avg_yaw_arm",              
+    "stddev_yaw_arm",           
+    "var_yaw_arm",
+    "kurtosis_roll_arm",
+    "kurtosis_picth_arm",
+    "kurtosis_yaw_arm", 
+    "skewness_roll_arm", 
+    "skewness_pitch_arm",
+    "skewness_yaw_arm",
+    "max_roll_arm",
+    "min_roll_arm",
+    "min_pitch_arm",
+    "kurtosis_roll_dumbbell",
+    "kurtosis_picth_dumbbell",
+    "kurtosis_yaw_dumbbell",
+    "skewness_roll_dumbbell",
+    "skewness_pitch_dumbbell",
+    "skewness_yaw_dumbbell",
+    "max_yaw_dumbbell",
+    "kurtosis_roll_forearm", 
+    "kurtosis_picth_forearm",
+    "kurtosis_yaw_forearm", 
+    "skewness_roll_forearm",
+    "skewness_pitch_forearm",
+    "skewness_yaw_forearm",
+    "max_roll_forearm",
+    "max_yaw_forearm",
+    "min_roll_forearm",
+    "avg_roll_forearm",
+    "stddev_roll_forearm", 
+    "var_roll_forearm",  
+    "avg_pitch_forearm", 
+    "stddev_pitch_forearm",
+    "var_pitch_forearm",
+    "avg_yaw_forearm",  
+    "stddev_yaw_forearm",
+    "min_yaw_dumbbell",
+    "amplitude_yaw_dumbbell",
+    "amplitude_yaw_forearm",
+    "min_yaw_forearm",
+    "var_yaw_forearm",
+    "max_roll_belt",
+    "max_picth_belt",
+    "min_roll_belt",
+    "min_pitch_belt"
+)
+
+#Apply the feature removal list to each data set
+training <- training[ , !names(training) %in% remFeatures]
+testing <- testing[ , !names(testing) %in% remFeatures]
+validation <- validation[, !names(validation) %in% remFeatures]
+
+#Eliminated columns with null values
+training <- training[, complete.cases(t(training))] 
+testing <- testing[, complete.cases(t(testing))] 
+validation <- validation[, complete.cases(t(validation))] 
+
+
+#Tested rf (random forest) gbm (boosting w/ trees) nb (naive bayes)
+modelFit <- train(training$classe ~ ., method="rf", data=training, verbose = FALSE)
+modelFit
+
+#compared accuracy of prediction method
+confusionMatrix(testing$classe, predict(modelFit, testing))
+
+#performed final prediction on validation set
+valPredict <- predict(modelFit, validation)
+```
