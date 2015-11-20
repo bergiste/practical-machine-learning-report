@@ -65,7 +65,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
-<p>For this project we used a Weight Lifting Exercise data set available at <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a>. The training data set can be downloaded at <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a> and the testing data set can be downloaded at <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a> .</p>
+<p>For this project we used a Weight Lifting Exercise data set available at <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a>. The training data set can be downloaded at <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a> and the testing data set can be downloaded at <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a>.</p>
 <p>The training data set contains 19622 records and 160 features. The testing data set contains 20 records with 160 features. It is important to note that the testing data set does not contain the answers, so, I considered it a validation set and I created a new testing set from a random sample of the training set.</p>
 </div>
 <div id="the-prediction-process" class="section level2">
@@ -73,7 +73,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <p>Given that we had a well defined question, the next step was to understand the data and the features. One of the positives is that we are using data that is directly tied to physical exercise to predict a physical exercise. Since this data set has 160 features, it was not as straight forward to clearly articulate all of the features. Nevertheless, I read the general information available from the source website about the features.</p>
 <div id="the-need-for-feature-reduction" class="section level3">
 <h3>The Need for Feature Reduction</h3>
-<p>My first instinct was that 160 features would not be necessary to make an accurate prediction. One of the first things I noticed immediately was that there were many missing values from the features. Also, I was very curious about the uniqueness of the values in the data.</p>
+<p>My first instinct was that 160 features would not be necessary to make an accurate prediction. One of the things I noticed immediately was that there were many missing values from the features. Also, I was very curious about the uniqueness of the values in the data.</p>
 <p>I performed the following activities which reduced the number of features from 160 to 53:</p>
 <ul>
 <li>Performed a uniqueness test by using R’s nearZeroVar function and safely eliminated any features that were considered near zero</li>
@@ -228,7 +228,6 @@ validation &lt;- validation[, complete.cases(t(validation))]
 
 
 #Tested rf (random forest) gbm (boosting w/ trees) nb (naive bayes)
-
 modelFit &lt;- train(training$classe ~ ., method=&quot;rf&quot;, data=training, verbose = FALSE)
 modelFit
 

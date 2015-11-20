@@ -9,7 +9,7 @@ output: html_document
 The objective of this project was to create a prediction algorithm to evaluate the manner in which an individual did a weight lifting exercise. There are a wide variety of devices (such as Jawbone Up, Nike FuelBand and Fitbit) that collect human physical movement information. The data that these devices collect can be used to determine what the individual was doing during the time of collection.
 
 ##Data
-For this project we used a Weight Lifting Exercise data set available at http://groupware.les.inf.puc-rio.br/har. The training data set can be downloaded at https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv and the testing data set can be downloaded at https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv .
+For this project we used a Weight Lifting Exercise data set available at http://groupware.les.inf.puc-rio.br/har. The training data set can be downloaded at https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv and the testing data set can be downloaded at https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv.
 
 The training data set contains 19622 records and 160 features. The testing data set contains 20 records with 160 features. It is important to note that the testing data set does not contain the answers, so, I considered it a validation set and I created a new testing set from a random sample of the training set.
 
@@ -17,7 +17,7 @@ The training data set contains 19622 records and 160 features. The testing data 
 Given that we had a well defined question, the next step was to understand the data and the features. One of the positives is that we are using data that is directly tied to physical exercise to predict a physical exercise. Since this data set has 160 features, it was not as straight forward to clearly articulate all of the features. Nevertheless, I read the general information available from the source website about the features.
 
 ###The Need for Feature Reduction
-My first instinct was that 160 features would not be necessary to make an accurate prediction. One of the first things I noticed immediately was that there were many missing values from the features. Also, I was very curious about the uniqueness of the values in the data.
+My first instinct was that 160 features would not be necessary to make an accurate prediction. One of the things I noticed immediately was that there were many missing values from the features. Also, I was very curious about the uniqueness of the values in the data.
 
 I performed the following activities which reduced the number of features from 160 to 53:
 
